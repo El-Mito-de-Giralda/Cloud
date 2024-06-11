@@ -1,2 +1,0 @@
-# Cloud
-Ejercicios de Cloud
