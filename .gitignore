@@ -9,3 +9,8 @@ junit.xml
 .awcache
 .env
 server/public
+
+.cache
+.config
+.dbus
+ssl
