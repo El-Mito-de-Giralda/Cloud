@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 03 Github branch
 
 In this example we are going to create a production server using Github pages.
@@ -139,7 +138,3 @@ We are an innovating team of Javascript experts, passionate about turning your i
 [Lemoncode](http://lemoncode.net/services/en/#en-home) provides training services.
 
 For the LATAM/Spanish audience we are running an Online Front End Master degree, more info: http://lemoncode.net/master-frontend
-=======
-# Cloud
-Ejercicios de Cloud
->>>>>>> origin/main
