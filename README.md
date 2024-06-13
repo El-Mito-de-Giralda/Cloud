@@ -1,133 +1,111 @@
-# 03 Github branch
+# 02 Azure FTP
 
-In this example we are going to create a production server using Github pages.
+In this example we are going to create a production server and upload it to Azure.
 
-We will start from `02-azure-ftp`.
+We will start from `01-production-bundle`.
 
 # Steps to build it
 
-`npm install` to install previous sample packages:
+We have a `dist` folder with app files, but to public this files in a production server, we need some kind of `server` to serve this static files. In this case, we are going to use a `nodejs` server.
+
+Create new `server` folder and:
 
 ```bash
-npm install
+cd ./server
 ```
 
-Using previous application, we upload it using [Github Pages](https://pages.github.com/). We only need to create a new `Public` repository.
-
-> NOTE: In this case we won't use `express server` to serve front app, because Github Pages has its own server.
-
-Upload files:
+Create package.json and install `express`:
 
 ```bash
-git init
-git remote add origin git@github.com...
-git add .
-git commit -m "initial commit"
-git push -u origin main
+npm init -y
+npm install express --save
 ```
 
-Run build command:
+Create a simple server using [express](https://github.com/expressjs/express):
 
-```bash
-npm run build
+_./server/index.js_
+
+```javascript
+const express = require('express');
+const path = require('path');
+
+const app = express();
+const staticFilesPath = path.resolve(__dirname, './public');
+app.use('/', express.static(staticFilesPath));
+
+const PORT = process.env.PORT || 8081;
+app.listen(PORT, () => {
+  console.log(`App running on http://localhost:${PORT}`);
+});
+
 ```
 
-Create a new branch called `gh-pages`.
+We can run it on local:
 
-Remove all files except `dist` folder. And move `dist` folder's files to root path. We should have on root path:
-
-```
-|--assets/
-|--index.html
-
-```
-
-Upload files:
-
-```bash
-git add .
-git commit -m "upload files"
-git push -u origin gh-pages
-```
-
-Now, we have deployed our website in: `https://<user-name>.github.io/<repository-name>`:
-
-![01-open-gh-pages-url](./readme-resources/01-open-gh-pages-url.png)
-
-> NOTE: We can change branch name on Settings tab > GitHub Pages section
-
-As we see, we have some errors when retrieving files:
-
-_https://<user-name>.github.io/assets/index-a824b72f.js net::ERR_ABORTED 404_
-
-This issue is related with the references to assets in the `index.html` file. We need to change the references to:
+_./server/package.json_
 
 ```diff
-<!DOCTYPE html>
-
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Cloud Module</title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
--   <script type="module" crossorigin src="/assets/index-a824b72f.js"></script>
--   <link rel="modulepreload" crossorigin href="/assets/vendor-13e230a0.js">
-+   <script type="module" crossorigin src="./assets/index-a824b72f.js"></script>
-+   <link rel="modulepreload" crossorigin href="./assets/vendor-13e230a0.js">
-  </head>
-  <body>
-    <div id="root"></div>
-
-  </body>
-</html>
+...
+  "scripts": {
+-   "test": "echo \"Error: no test specified\" && exit 1"
++   "start": "node index.js"
+  },
 ```
 
-> Due to Github Pages uses a subpath for the project, we need to add `./` to the references.
+Before running, we need to copy `./dist` folder content to `./server/public`.
 
-Instead of doing manually, we will change the bunlder config. Checkout to main branch
+```
+|server/
+|-- node_modules/
+|-- public/
+|----- assets/
+|----- index.html
+|-- index.js
+|-- package-lock.json
+|-- package.json
+```
+
+Run it:
 
 ```bash
-git checkout main
-
+npm start
 ```
 
-Update config:
+Now, we can configure a web server in `Azure` to upload files via FTP.
 
-_./vite.config.js_
+![01-clik-on-create-app-service-button](./readme-resources/01-clik-on-create-app-service-button.png)
 
-```diff
-import { defineConfig, splitVendorChunkPlugin } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+![02-create-app-service](./readme-resources/02-create-app-service.png)
 
-export default defineConfig({
-+ base: './',
-  envPrefix: 'PUBLIC_',
-  ...
-```
+Navigate to deploy center.
 
-> [Vite Public base path](https://vitejs.dev/guide/build.html#public-base-path)
+![03-go-to-resource](./readme-resources/03-go-to-resource.png)
 
-Run build command:
+![04-navigate-deploy-center](./readme-resources/04-navigate-deploy-center.png)
 
-```bash
-npm install
+And click on FTP:
 
-npm run build
+![05-use-ftp](./readme-resources/05-use-ftp.png)
 
-```
+We can use whatever ftp client to connect to our server and copy all files from. In this case we will user [Filezilla portable version](https://filezilla-project.org/)
 
-Copy `dist` folder to `gh-pages` branch as above.
+Copy `Host`, `Username` and `Password` values
 
-Commit and push:
+![06-use-ftp-credentials](./readme-resources/06-use-ftp-credentials.png)
 
-```bash
-git add .
-git commit -m "upload files with base path"
-git push
+Remove `hostingstart.html`:
 
-```
+![07-remove-file](./readme-resources/07-remove-file.png)
+
+Copy inner `./server` folders and files.
+
+![08-upload-files](./readme-resources/08-upload-files.png)
+
+> Important: including `node_modules`.
+
+Open server URL:
+
+![09-open-server-url](./readme-resources/09-open-server-url.png)
 
 # About Basefactor + Lemoncode
 
